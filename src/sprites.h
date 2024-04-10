@@ -1,3 +1,26 @@
+// Paddle 1
+
+static const uint8_t paddle1_data[128] = {0xff};
+Bitmap bmpPaddle1 = Bitmap(16, 64, paddle1_data, PixelFormat::Mask, RGB888(255, 255, 0));
+
+
+// Paddle 2
+static const uint8_t paddle2_data[128] = {0xff};
+Bitmap bmpPaddle2 = Bitmap(16, 64, paddle2_data, PixelFormat::Mask, RGB888(255, 255, 0));
+
+
+// Ball 
+static const uint8_t ball_data[512] = {0xff};
+Bitmap bmpBall = Bitmap(8, 64, ball_data, PixelFormat::Mask, RGB888(255, 255, 0));
+
+// Wall 
+static const uint8_t wall_data[100] = {0xff};
+Bitmap bmpWall = Bitmap(4, 200, wall_data, PixelFormat::Mask, RGB888(255, 255, 0));
+
+
+
+
+
 // enemy_fire: 2x 3x7
 const uint8_t enemy_fire_data[][7] = {
   // frame 0
