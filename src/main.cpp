@@ -11,6 +11,10 @@ fabgl::VGAController DisplayController;
 fabgl::Canvas canvas(&DisplayController);
 SoundGenerator soundGenerator;
 
+int centerText(const char* text, int charLength){
+  return DisplayController.getViewPortWidth()/2 - strlen(text) * charLength;
+}
+
 // IntroScene
 struct IntroScene : public Scene
 {
@@ -32,13 +36,13 @@ struct IntroScene : public Scene
 
   void init()
   {
-    canvas.setBrushColor(0, 0, 0);
+    canvas.setBrushColor(0, 0, 255);
     canvas.clear();
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
     canvas.selectFont(&fabgl::FONT_8x8);
     canvas.setPenColor(217, 245, 255);
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(5));
-    canvas.drawText(50, 20, "PONG");
+    canvas.drawText(centerText("PONG", 8), 20, "PONG");
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
 
     canvas.setPenColor(59, 167, 204);
