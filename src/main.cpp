@@ -199,20 +199,20 @@ struct GameScene : public Scene
 
   void update(int updateCount)
   {
-    if (Ps3.data.analog.stick.ly < -80){
-      player1VelY_ = -1;
+    if (Ps3.data.analog.stick.ry < -80){
+      player1VelY_ = -2;
     }
-    else if (Ps3.data.analog.stick.ly > 80){
-      player1VelY_ = +1;
+    else if (Ps3.data.analog.stick.ry > 80){
+      player1VelY_ = +2;
     }
     else{
       player1VelY_ = 0;
     }
-    if (Ps3.data.analog.stick.ry < -80){
-      player2VelY_ = -1;
+    if (Ps3.data.analog.stick.ly < -80){
+      player2VelY_ = -2;
     }
-    else if (Ps3.data.analog.stick.ry > 80){
-      player2VelY_ = +1;
+    else if (Ps3.data.analog.stick.ly > 80){
+      player2VelY_ = +2;
     }
     else{
       player2VelY_ = 0;
