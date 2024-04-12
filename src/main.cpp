@@ -42,7 +42,7 @@ struct IntroScene : public Scene
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
 
     canvas.setPenColor(59, 167, 204);
-    canvas.drawText(85, 40, "con ESP32 por FIE");
+    //canvas.drawText(85, 40, "con ESP32 por FIE");
     canvas.drawText(30, 55, "Facultad de Ingenieria Electrica.");
 
     canvas.setPenColor(248, 252, 167);
@@ -108,6 +108,17 @@ struct GameScene : public Scene
     TYPE_BALL,
   };
 
+  enum GameState
+  {
+    GAMESTATE_PLAYING,
+    GAMESTATE_PLAYERSCORE,
+    GAMESTATE_GAMEOVER,
+  };
+
+  GameState gameState_ = GAMESTATE_PLAYING;
+
+
+
   struct SISprite : Sprite
   {
     SpriteType type;
@@ -147,6 +158,7 @@ struct GameScene : public Scene
 
 
   bool updateScore_ = true;
+  
   GameScene()
       : Scene(3, 20, DisplayController.getViewPortWidth(), DisplayController.getViewPortHeight())
   {
@@ -194,8 +206,37 @@ struct GameScene : public Scene
    
   }
 
+  void drawScore()
+  {
+    canvas.setBrushColor(0, 0, 0);
+    canvas.setPenColor(255, 255, 255);
+    canvas.drawText(140, 10, "P1: ");
+    canvas.drawTextFmt(180, 10, scoreP1_);
+    canvas.drawText(200, 10, "P2: ");
+    canvas.drawTextFmt(240, 10, scoreP2_);
+  }
+
   void update(int updateCount)
   {
+    if(updateScore_){
+      updateScore_ == false;
+      drawScore();
+    }
+
+    if(gameState_ == GAMESTATE_PLAYING){
+      moveBall();
+    }
+
+    if(gameState_ == GAMESTATE_PLAYERSCORE){
+      updateScore_ = true;
+      drawScore();
+      gameState_ = GAMESTATE_PLAYING;
+    }
+
+    if(gameState_ == GAMESTATE_GAMEOVER){
+      gameState_ = GAMESTATE_PLAYING;
+    }
+
   }
 
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
