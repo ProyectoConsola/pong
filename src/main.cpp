@@ -42,11 +42,7 @@ struct IntroScene : public Scene
     canvas.selectFont(&fabgl::FONT_8x8);
     canvas.setPenColor(217, 245, 255);
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(5));
-<<<<<<< HEAD
     canvas.drawText(centerText("PONG", 8), 20, "PONG");
-=======
-    canvas.drawText(135, 20, "PONG");
->>>>>>> 73503d78d51a30a3b816a1274b1dac87e0c95cb3
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
 
     canvas.setPenColor(59, 167, 204);
