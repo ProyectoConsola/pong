@@ -11,6 +11,10 @@ fabgl::VGAController DisplayController;
 fabgl::Canvas canvas(&DisplayController);
 SoundGenerator soundGenerator;
 
+int centerText(const char* text, int charLength){
+  return (DisplayController.getViewPortWidth() - strlen(text) * charLength)/2;
+}
+
 // IntroScene
 struct IntroScene : public Scene
 {
@@ -37,8 +41,8 @@ struct IntroScene : public Scene
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
     canvas.selectFont(&fabgl::FONT_8x8);
     canvas.setPenColor(217, 245, 255);
-    canvas.setGlyphOptions(GlyphOptions().DoubleWidth(5));
-    canvas.drawText(135, 20, "PONG");
+    canvas.setGlyphOptions(GlyphOptions().DoubleWidth(1));
+    canvas.drawText(centerText("PONG", 16), 20, "PONG");
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
 
     canvas.setPenColor(59, 167, 204);
@@ -50,12 +54,6 @@ struct IntroScene : public Scene
     canvas.setPenColor(248, 252, 167);
 
     canvas.setBrushColor(21, 26, 70);
-    canvas.drawText(60,140, "Jugador 1");
-    canvas.drawText(170,140, "Jugador 2");
-
-
-
-
   }
 
   void update(int updateCount)
@@ -137,11 +135,15 @@ struct GameScene : public Scene
   static const int BALLCOUNT = 1;
   static const int SPRITESCOUNT = 2 * PADDLECOUNT + BALLCOUNT;
 
-  static const int BALL_START_X = 159;
+  static const int BALL_START_X = 157;
   static const int BALL_START_Y = 95;
   static const int PADDLE1_START_X = 303;
   static const int PADDLE2_START_X = 9;
   static const int PADDLE_START_Y = 81;
+  static const int POINT_START_X = 158;
+  static const int POINT_END_X = 159;
+  int POINT_START_Y = 8;
+  int POINT_END_Y = 9;
 
   static int scoreP1_;
   static int scoreP2_;
@@ -198,12 +200,13 @@ struct GameScene : public Scene
     canvas.drawRectangle(17, 4, 301, 5);
     canvas.drawRectangle(17, 188, 301, 189);
     for(int i = 1; i <= 46; i++){
-
+      canvas.drawRectangle(POINT_START_X, POINT_START_Y, POINT_END_X, POINT_END_Y);
+      POINT_START_Y += 4;
+      POINT_END_Y += 4;
     }
   }
 
   void moveBall(){
-   
   }
 
   void drawScore()
@@ -219,25 +222,32 @@ struct GameScene : public Scene
 
   void update(int updateCount)
   {
-    if(updateScore_){
-      updateScore_ == false;
-      drawScore();
+    if (Ps3.data.analog.stick.ry < -80){
+      player1VelY_ = -2;
     }
-
-    if(gameState_ == GAMESTATE_PLAYING){
-      moveBall();
+    else if (Ps3.data.analog.stick.ry > 80){
+      player1VelY_ = +2;
     }
-
-    if(gameState_ == GAMESTATE_PLAYERSCORE){
-      updateScore_ = true;
-      drawScore();
-      gameState_ = GAMESTATE_PLAYING;
+    else{
+      player1VelY_ = 0;
     }
-
-    if(gameState_ == GAMESTATE_GAMEOVER){
-      gameState_ = GAMESTATE_PLAYING;
+    if (Ps3.data.analog.stick.ly < -80){
+      player2VelY_ = -2;
     }
+    else if (Ps3.data.analog.stick.ly > 80){
+      player2VelY_ = +2;
+    }
+    else{
+      player2VelY_ = 0;
+    }
+    player1_->y += player1VelY_;
+    player1_->y= iclamp(player1_->y, 0, getHeight() - player1_->getHeight());
+    updateSprite(player1_);
+    player2_->y += player2VelY_;
+    player2_->y= iclamp(player2_->y, 0, getHeight() - player2_->getHeight());
+    updateSprite(player2_);
 
+    DisplayController.refreshSprites();
   }
 
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
