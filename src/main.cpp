@@ -210,10 +210,11 @@ struct GameScene : public Scene
   {
     canvas.setBrushColor(0, 0, 0);
     canvas.setPenColor(255, 255, 255);
-    canvas.drawText(140, 10, "P1: ");
-    canvas.drawTextFmt(180, 10, scoreP1_);
-    canvas.drawText(200, 10, "P2: ");
-    canvas.drawTextFmt(240, 10, scoreP2_);
+    canvas.selectFont(&fabgl::FONT_8x16);
+    canvas.drawText(184, 10,"");
+    canvas.drawTextFmt(143, 10, "%02d" , scoreP1_);
+    canvas.drawText(200, 10, "");
+    canvas.drawTextFmt(175, 10, "%02d" ,scoreP2_);
   }
 
   void update(int updateCount)
