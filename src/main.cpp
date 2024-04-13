@@ -55,8 +55,14 @@ struct IntroScene : public Scene
     canvas.drawText(centerText("con ESP32 por FIE", 8), 65, "con ESP32 por FIE");
     canvas.drawText(centerText("Facultad de Ingenieria Electrica.", 8), 80, "Facultad de Ingenieria Electrica.");
 
+<<<<<<< HEAD
     canvas.drawBitmap(PADDLE1_START_X, PADDLE_START_Y - 20, &bmpPaddle);
     canvas.drawBitmap(PADDLE2_START_X, PADDLE_START_Y + 15, &bmpPaddle);
+=======
+    canvas.setPenColor(59, 167, 204);
+    //canvas.drawText(85, 40, "con ESP32 por FIE");
+    canvas.drawText(30, 55, "Facultad de Ingenieria Electrica.");
+>>>>>>> 302080d58282156ef7480ac558a973bc44a5fb0b
 
     canvas.drawBitmap(BALL_START_X - 56 - 4, BALL_START_Y + 59 - 4, &bmpBall_2);
     canvas.drawBitmap(BALL_START_X - 56 - 2, BALL_START_Y + 59 - 2, &bmpBall_1);
@@ -117,6 +123,17 @@ struct GameScene : public Scene
     TYPE_BALL,
   };
 
+  enum GameState
+  {
+    GAMESTATE_PLAYING,
+    GAMESTATE_PLAYERSCORE,
+    GAMESTATE_GAMEOVER,
+  };
+
+  GameState gameState_ = GAMESTATE_PLAYING;
+
+
+
   struct SISprite : Sprite
   {
     SpriteType type;
@@ -160,6 +177,7 @@ struct GameScene : public Scene
 
 
   bool updateScore_ = true;
+  
   GameScene()
       : Scene(3, 20, DisplayController.getViewPortWidth(), DisplayController.getViewPortHeight())
   {
@@ -206,6 +224,17 @@ struct GameScene : public Scene
   }
 
   void moveBall(){
+  }
+
+  void drawScore()
+  {
+    canvas.setBrushColor(0, 0, 0);
+    canvas.setPenColor(255, 255, 255);
+    canvas.selectFont(&fabgl::FONT_8x16);
+    canvas.drawText(184, 10,"");
+    canvas.drawTextFmt(143, 10, "%02d" , scoreP1_);
+    canvas.drawText(200, 10, "");
+    canvas.drawTextFmt(175, 10, "%02d" ,scoreP2_);
   }
 
   void update(int updateCount)
