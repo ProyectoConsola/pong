@@ -116,19 +116,9 @@ struct GameScene : public Scene
   GameState gameState_ = GAMESTATE_PLAYING;
 
 
-
   struct SISprite : Sprite
   {
     SpriteType type;
-  };
-
-  enum GameState
-  {
-    GAMESTATE_PLAYING,
-    GAMESTATE_PLAYERKILLED,
-    GAMESTATE_PLAYER2KILLED,
-    GAMESTATE_ENDGAME,
-    GAMESTATE_GAMEOVER,
   };
 
   static const int PADDLECOUNT = 1;
@@ -156,9 +146,6 @@ struct GameScene : public Scene
   int player1VelY_ = 0; // 0 = no move
   int player2VelY_ = 0;
   
-  GameState gameState_ = GAMESTATE_PLAYING;
-
-
   bool updateScore_ = true;
   
   GameScene()
@@ -206,7 +193,16 @@ struct GameScene : public Scene
     }
   }
 
-  void moveBall(){
+  void moveBall(int x, int y, bool *touchSide){
+     if (ball_->visible)
+    {
+      if (x <= 0 || x >= getWidth() - ball_->getWidth())
+        *touchSide = true;
+      ball_->moveTo(x, y);
+      ball_->setFrame(ball_->getFrameIndex() ? 0 : 1);
+      updateSprite(ball_);
+    }
+
   }
 
   void drawScore()
@@ -214,14 +210,16 @@ struct GameScene : public Scene
     canvas.setBrushColor(0, 0, 0);
     canvas.setPenColor(255, 255, 255);
     canvas.selectFont(&fabgl::FONT_8x16);
-    canvas.drawText(184, 10,"");
-    canvas.drawTextFmt(143, 10, "%02d" , scoreP1_);
-    canvas.drawText(200, 10, "");
-    canvas.drawTextFmt(175, 10, "%02d" ,scoreP2_);
+    canvas.drawTextFmt(130, 10, "%02d" , scoreP1_);
+    canvas.drawTextFmt(172, 10, "%02d" ,scoreP2_);
   }
 
   void update(int updateCount)
   {
+    if(updateScore_){
+      drawScore();
+      updateScore_ = false;
+    }
     if (Ps3.data.analog.stick.ry < -80){
       player1VelY_ = -2;
     }
@@ -247,8 +245,16 @@ struct GameScene : public Scene
     player2_->y= iclamp(player2_->y, 0, getHeight() - player2_->getHeight());
     updateSprite(player2_);
 
+    
+
+
     DisplayController.refreshSprites();
   }
+
+  void GameOver(){
+  }
+
+
 
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
   {
@@ -260,18 +266,18 @@ int GameScene::scoreP2_ = 0;
 
 void setup()
 {
-  Ps3.begin("24:6f:28:af:1c:66");
+  Ps3.begin("24:6f:28:af:1c:61");
   DisplayController.begin();
   DisplayController.setResolution(VGA_320x200_75Hz);
 }
 
 void loop()
 {
-  if (true)
+  /*if (true)
   {
     IntroScene introScene;
     introScene.start();
-  }
+  }*/
   GameScene gameScene;
   gameScene.start();
 }
