@@ -18,13 +18,18 @@ int centerText(const char* text, int charLength){
 // IntroScene
 struct IntroScene : public Scene
 {
+  static const int PADDLE1_START_X = 303;
+  static const int PADDLE2_START_X = 9;
+  static const int PADDLE_START_Y = 81;
+  static const int BALL_START_X = 157;
+  static const int BALL_START_Y = 95;
+  static const int POINT_START_X = 158;
+  static const int POINT_END_X = 159;
+  int POINT_START_Y = 8;
+  int POINT_END_Y = 9;
 
-  static const int TEXTROWS = 4;
-  static const int TEXT_X = 130;
-  static const int TEXT_Y = 122;
-
-  int textRow_ = 0;
-  int textCol_ = 0;
+  //int textRow_ = 0;
+  //int textCol_ = 0;
   int starting_ = 0;
 
   SamplesGenerator *music_ = nullptr;
@@ -39,21 +44,27 @@ struct IntroScene : public Scene
     canvas.setBrushColor(0, 0, 0);
     canvas.clear();
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
-    canvas.selectFont(&fabgl::FONT_8x8);
+    canvas.selectFont(&fabgl::FONT_10x20);
     canvas.setPenColor(217, 245, 255);
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(1));
-    canvas.drawText(centerText("PONG", 16), 20, "PONG");
+    canvas.drawText(centerText("PONG", 20), 20, "PONG");
+
+    canvas.selectFont(&fabgl::FONT_8x8);
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
+    canvas.setPenColor(224, 158, 16);
+    canvas.drawText(centerText("con ESP32 por FIE", 8), 65, "con ESP32 por FIE");
+    canvas.drawText(centerText("Facultad de Ingenieria Electrica.", 8), 80, "Facultad de Ingenieria Electrica.");
 
-    canvas.setPenColor(59, 167, 204);
-    //canvas.drawText(85, 40, "con ESP32 por FIE");
-    canvas.drawText(30, 55, "Facultad de Ingenieria Electrica.");
+    canvas.drawBitmap(PADDLE1_START_X, PADDLE_START_Y - 20, &bmpPaddle);
+    canvas.drawBitmap(PADDLE2_START_X, PADDLE_START_Y + 15, &bmpPaddle);
 
-    canvas.setPenColor(248, 252, 167);
-    canvas.setBrushColor(0, 0, 0);
-    canvas.setPenColor(248, 252, 167);
+    canvas.drawBitmap(BALL_START_X - 56 - 4, BALL_START_Y + 59 - 4, &bmpBall_2);
+    canvas.drawBitmap(BALL_START_X - 56 - 2, BALL_START_Y + 59 - 2, &bmpBall_1);
+    canvas.drawBitmap(BALL_START_X - 56, BALL_START_Y + 59, &bmpBall);
 
-    canvas.setBrushColor(21, 26, 70);
+    canvas.setPenColor(255, 255, 255);
+    canvas.drawRectangle(17, 4, 301, 5);
+    canvas.drawRectangle(17, 188, 301, 189);
   }
 
   void update(int updateCount)
@@ -77,8 +88,8 @@ struct IntroScene : public Scene
     {
       if (updateCount % 20 == 0)
       {
-        canvas.setPenColor(random(255), random(255), 255);
-        canvas.drawText(50, 75, "Presiona [START] para jugar");
+        canvas.setPenColor(255, random(255), random(255));
+        canvas.drawText(centerText("Presiona [START] para jugar", 8), 100, "Presiona [START] para jugar");
       }
 
       // handle keyboard or mouse (after two seconds)
@@ -145,7 +156,12 @@ struct GameScene : public Scene
 
   int player1VelY_ = 0; // 0 = no move
   int player2VelY_ = 0;
+<<<<<<< HEAD
   
+=======
+
+
+>>>>>>> 0857b844922b58870032bc781d79b4ff89fac136
   bool updateScore_ = true;
   
   GameScene()
@@ -266,7 +282,11 @@ int GameScene::scoreP2_ = 0;
 
 void setup()
 {
+<<<<<<< HEAD
   Ps3.begin("24:6f:28:af:1c:61");
+=======
+  Ps3.begin("78:dd:08:4d:94:a4");
+>>>>>>> 0857b844922b58870032bc781d79b4ff89fac136
   DisplayController.begin();
   DisplayController.setResolution(VGA_320x200_75Hz);
 }
