@@ -55,14 +55,8 @@ struct IntroScene : public Scene
     canvas.drawText(centerText("con ESP32 por FIE", 8), 65, "con ESP32 por FIE");
     canvas.drawText(centerText("Facultad de Ingenieria Electrica.", 8), 80, "Facultad de Ingenieria Electrica.");
 
-<<<<<<< HEAD
     canvas.drawBitmap(PADDLE1_START_X, PADDLE_START_Y - 20, &bmpPaddle);
     canvas.drawBitmap(PADDLE2_START_X, PADDLE_START_Y + 15, &bmpPaddle);
-=======
-    canvas.setPenColor(59, 167, 204);
-    //canvas.drawText(85, 40, "con ESP32 por FIE");
-    canvas.drawText(30, 55, "Facultad de Ingenieria Electrica.");
->>>>>>> 302080d58282156ef7480ac558a973bc44a5fb0b
 
     canvas.drawBitmap(BALL_START_X - 56 - 4, BALL_START_Y + 59 - 4, &bmpBall_2);
     canvas.drawBitmap(BALL_START_X - 56 - 2, BALL_START_Y + 59 - 2, &bmpBall_1);
@@ -139,15 +133,6 @@ struct GameScene : public Scene
     SpriteType type;
   };
 
-  enum GameState
-  {
-    GAMESTATE_PLAYING,
-    GAMESTATE_PLAYERKILLED,
-    GAMESTATE_PLAYER2KILLED,
-    GAMESTATE_ENDGAME,
-    GAMESTATE_GAMEOVER,
-  };
-
   static const int PADDLECOUNT = 1;
   static const int BALLCOUNT = 1;
   static const int SPRITESCOUNT = 2 * PADDLECOUNT + BALLCOUNT;
@@ -172,8 +157,6 @@ struct GameScene : public Scene
 
   int player1VelY_ = 0; // 0 = no move
   int player2VelY_ = 0;
-  
-  GameState gameState_ = GAMESTATE_PLAYING;
 
 
   bool updateScore_ = true;
@@ -277,7 +260,7 @@ int GameScene::scoreP2_ = 0;
 
 void setup()
 {
-  Ps3.begin("24:6f:28:af:1c:66");
+  Ps3.begin("78:dd:08:4d:94:a4");
   DisplayController.begin();
   DisplayController.setResolution(VGA_320x200_75Hz);
 }
