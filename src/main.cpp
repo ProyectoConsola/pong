@@ -156,12 +156,7 @@ struct GameScene : public Scene
 
   int player1VelY_ = 0; // 0 = no move
   int player2VelY_ = 0;
-<<<<<<< HEAD
   
-=======
-
-
->>>>>>> 0857b844922b58870032bc781d79b4ff89fac136
   bool updateScore_ = true;
   
   GameScene()
@@ -282,11 +277,7 @@ int GameScene::scoreP2_ = 0;
 
 void setup()
 {
-<<<<<<< HEAD
-  Ps3.begin("24:6f:28:af:1c:61");
-=======
   Ps3.begin("78:dd:08:4d:94:a4");
->>>>>>> 0857b844922b58870032bc781d79b4ff89fac136
   DisplayController.begin();
   DisplayController.setResolution(VGA_320x200_75Hz);
 }
