@@ -253,9 +253,7 @@ struct GameScene : public Scene
 
   void drawScore()
   {
-    //canvas.setBrushColor(0, 0, 0);
     canvas.setPenColor(255, 255, 255);
-    //canvas.selectFont(&fabgl::FONT_8x16);
     canvas.drawTextFmt(130, 10, "%02d" , scoreP1_);
     canvas.drawTextFmt(172, 10, "%02d" ,scoreP2_);
   }
@@ -274,20 +272,26 @@ struct GameScene : public Scene
   }
 
   void resetBall(){
-    ball_->moveTo(BALL_START_X, BALL_START_Y);
     ballVelX = 0;
     ballVelY = 0;
+    ball_->moveTo(BALL_START_X, BALL_START_Y);
     reseted_ = true;
   }
 
   void startBall(int rn){
+    int random = rand() % 100;
     if (rn % 2){
       ballVelX = 2;
     }
     else {
       ballVelX = -2;
     }
-    ballVelY = 2;
+    if (random % 2){
+      ballVelY = -2;
+    }
+    else{
+      ballVelY = 2;
+    }
     reseted_ = false;
   }
 
