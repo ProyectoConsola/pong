@@ -69,6 +69,8 @@ struct IntroScene : public Scene
     
     if (starting_)
     {
+      if (starting_ > 50)
+        stop();
       ++starting_;
       canvas.scroll(0, -5);
     }
@@ -360,11 +362,8 @@ void setup()
 
 void loop()
 {
-  /*if (true)
-  {
-    IntroScene introScene;
-    introScene.start();
-  }*/
+  IntroScene introScene;
+  introScene.start();
   GameScene gameScene;
   gameScene.start();
 }
