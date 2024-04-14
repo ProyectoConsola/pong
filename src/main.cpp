@@ -150,6 +150,8 @@ struct GameScene : public Scene
   bool updateScore_ = true;
   bool scored_ = false;
   bool reseted_ = true;
+  bool impulsed_ = false;
+  bool collided_ = false;
   
   GameScene()
       : Scene(3, 20, DisplayController.getViewPortWidth(), DisplayController.getViewPortHeight())
@@ -198,15 +200,28 @@ struct GameScene : public Scene
     canvas.selectFont(&fabgl::FONT_8x16);
   }
 
-  void moveBall(){
-    if(ball_->y < 7 || ball_->y > 186){
+  void moveBall(int rn){
+    if((ball_->y < 7 || ball_->y > 184) && !collided_){
       ballVelY = -ballVelY;
+      collided_ = true;
+      impulsed_ = false;
     }
-    if(ballVelY > 4){
-      ballVelY--;
+    if (!impulsed_ && rn % 2){
+      if(ballVelY > 3){
+        ballVelY--;
+      }
+      else if (ballVelY < -3){
+        ballVelY++;
+      }
+      else if(ballVelX > 3){
+        ballVelX--;
+      }
+      else if (ballVelX < -3){
+        ballVelX++;
+      }
     }
-    if (ballVelY < -4){
-      ballVelY++;
+    else{
+      collided_ = false;
     }
     ball_->x += ballVelX;
     ball_->y += ballVelY;
@@ -265,10 +280,10 @@ struct GameScene : public Scene
 
   void startBall(int rn){
     if (rn % 2){
-      ballVelX = 3;
+      ballVelX = 2;
     }
     else {
-      ballVelX = -3;
+      ballVelX = -2;
     }
     ballVelY = 2;
     reseted_ = false;
@@ -288,7 +303,7 @@ struct GameScene : public Scene
       startBall(updateCount);
     }
     movePlayer();
-    moveBall();
+    moveBall(updateCount);
     scoreGoal();
     player1_->y += player1VelY_;
     player1_->y= iclamp(player1_->y, 0, getHeight() - player1_->getHeight());
@@ -300,9 +315,6 @@ struct GameScene : public Scene
     DisplayController.refreshSprites();
   }
 
-  void GameOver(){
-  }
-
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
   {
     SISprite *sA = (SISprite *)spriteA;
@@ -310,22 +322,28 @@ struct GameScene : public Scene
 
     if (sA->type == TYPE_PADDLE1 && sB->type == TYPE_BALL){
       ballVelX = -ballVelX;
+      if (ballVelX >= -4)
+        ballVelX--;
       if (player1VelY_){
         ballVelY += player1VelY_;
       }
       else{
         ballVelY/=2;
       }
+      impulsed_ = true;
     }
 
     if (sA->type == TYPE_PADDLE2 && sB->type == TYPE_BALL){
       ballVelX = -ballVelX;
+      if (ballVelX <= 4)
+        ballVelX++;
       if (player2VelY_){
         ballVelY += player2VelY_;
       }
       else{
         ballVelY/=2;
       }
+      impulsed_ = true;
     }
   }
 };
