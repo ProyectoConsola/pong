@@ -5,6 +5,9 @@
 #include "sounds.h"
 #include "WiFiGeneric.h"
 
+// Ambas barras se mueven con los dos sticks del mando
+// La pelota comienza a moverse una vez se haya pulsado D-Pad abajo, o X en el mando
+
 using fabgl::iclamp;
 
 fabgl::VGAController DisplayController;
@@ -23,13 +26,7 @@ struct IntroScene : public Scene
   static const int PADDLE_START_Y = 81;
   static const int BALL_START_X = 157;
   static const int BALL_START_Y = 95;
-  static const int POINT_START_X = 158;
-  static const int POINT_END_X = 159;
-  int POINT_START_Y = 8;
-  int POINT_END_Y = 9;
 
-  //int textRow_ = 0;
-  //int textCol_ = 0;
   int starting_ = 0;
 
   SamplesGenerator *music_ = nullptr;
@@ -58,8 +55,8 @@ struct IntroScene : public Scene
     canvas.drawBitmap(PADDLE1_START_X, PADDLE_START_Y - 20, &bmpPaddle);
     canvas.drawBitmap(PADDLE2_START_X, PADDLE_START_Y + 15, &bmpPaddle);
 
-    canvas.drawBitmap(BALL_START_X - 56 - 4, BALL_START_Y + 59 - 4, &bmpBall_2);
-    canvas.drawBitmap(BALL_START_X - 56 - 2, BALL_START_Y + 59 - 2, &bmpBall_1);
+    canvas.drawBitmap(BALL_START_X - 60, BALL_START_Y + 55, &bmpBall_2);
+    canvas.drawBitmap(BALL_START_X - 58, BALL_START_Y + 57, &bmpBall_1);
     canvas.drawBitmap(BALL_START_X - 56, BALL_START_Y + 59, &bmpBall);
 
     canvas.setPenColor(255, 255, 255);
@@ -72,15 +69,6 @@ struct IntroScene : public Scene
     
     if (starting_)
     {
-
-      if (starting_ > 50)
-      {
-        // stop music
-        soundGenerator.detach(music_);
-        // stop scene
-        stop();
-      }
-
       ++starting_;
       canvas.scroll(0, -5);
     }
@@ -92,7 +80,6 @@ struct IntroScene : public Scene
         canvas.drawText(centerText("Presiona [START] para jugar", 8), 100, "Presiona [START] para jugar");
       }
 
-      // handle keyboard or mouse (after two seconds)
       if (updateCount > 50)
       {
         if (Ps3.event.button_down.start)
@@ -154,10 +141,15 @@ struct GameScene : public Scene
   SISprite *player2_ = player1_ + PADDLECOUNT;
   SISprite *ball_ = player2_ + PADDLECOUNT;
 
-  int player1VelY_ = 0; // 0 = no move
+  int player1VelY_ = 0;
   int player2VelY_ = 0;
   
+  int ballVelX = 0;
+  int ballVelY = 0;
+  
   bool updateScore_ = true;
+  bool scored_ = false;
+  bool reseted_ = true;
   
   GameScene()
       : Scene(3, 20, DisplayController.getViewPortWidth(), DisplayController.getViewPortHeight())
@@ -202,35 +194,26 @@ struct GameScene : public Scene
       POINT_START_Y += 4;
       POINT_END_Y += 4;
     }
-  }
-
-  void moveBall(int x, int y, bool *touchSide){
-     if (ball_->visible)
-    {
-      if (x <= 0 || x >= getWidth() - ball_->getWidth())
-        *touchSide = true;
-      ball_->moveTo(x, y);
-      ball_->setFrame(ball_->getFrameIndex() ? 0 : 1);
-      updateSprite(ball_);
-    }
-
-  }
-
-  void drawScore()
-  {
-    canvas.setBrushColor(0, 0, 0);
-    canvas.setPenColor(255, 255, 255);
+    canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
     canvas.selectFont(&fabgl::FONT_8x16);
-    canvas.drawTextFmt(130, 10, "%02d" , scoreP1_);
-    canvas.drawTextFmt(172, 10, "%02d" ,scoreP2_);
   }
 
-  void update(int updateCount)
-  {
-    if(updateScore_){
-      drawScore();
-      updateScore_ = false;
+  void moveBall(){
+    if(ball_->y < 7 || ball_->y > 186){
+      ballVelY = -ballVelY;
     }
+    if(ballVelY > 4){
+      ballVelY--;
+    }
+    if (ballVelY < -4){
+      ballVelY++;
+    }
+    ball_->x += ballVelX;
+    ball_->y += ballVelY;
+    updateSpriteAndDetectCollisions(ball_);
+  }
+
+  void movePlayer(){
     if (Ps3.data.analog.stick.ry < -80){
       player1VelY_ = -2;
     }
@@ -249,15 +232,70 @@ struct GameScene : public Scene
     else{
       player2VelY_ = 0;
     }
+  }
+
+  void drawScore()
+  {
+    //canvas.setBrushColor(0, 0, 0);
+    canvas.setPenColor(255, 255, 255);
+    //canvas.selectFont(&fabgl::FONT_8x16);
+    canvas.drawTextFmt(130, 10, "%02d" , scoreP1_);
+    canvas.drawTextFmt(172, 10, "%02d" ,scoreP2_);
+  }
+
+  void scoreGoal(){
+    if (ball_->x > 308 && !scored_){
+      scoreP2_++;
+      updateScore_ = true;
+      scored_ = true;
+    }
+    else if (ball_->x < 10 && !scored_){
+      scoreP1_++;
+      updateScore_ = true;
+      scored_ = true;
+    }
+  }
+
+  void resetBall(){
+    ball_->moveTo(BALL_START_X, BALL_START_Y);
+    ballVelX = 0;
+    ballVelY = 0;
+    reseted_ = true;
+  }
+
+  void startBall(int rn){
+    if (rn % 2){
+      ballVelX = 3;
+    }
+    else {
+      ballVelX = -3;
+    }
+    ballVelY = 2;
+    reseted_ = false;
+  }
+
+  void update(int updateCount)
+  {
+    if(updateScore_){
+      drawScore();
+      updateScore_ = false;
+    }
+    if (scored_){
+      resetBall();
+      scored_ = false;
+    }
+    if (reseted_ && (Ps3.event.analog_changed.button.cross || Ps3.event.analog_changed.button.down)){
+      startBall(updateCount);
+    }
+    movePlayer();
+    moveBall();
+    scoreGoal();
     player1_->y += player1VelY_;
     player1_->y= iclamp(player1_->y, 0, getHeight() - player1_->getHeight());
-    updateSprite(player1_);
+    updateSpriteAndDetectCollisions(player1_);
     player2_->y += player2VelY_;
     player2_->y= iclamp(player2_->y, 0, getHeight() - player2_->getHeight());
-    updateSprite(player2_);
-
-    
-
+    updateSpriteAndDetectCollisions(player2_);
 
     DisplayController.refreshSprites();
   }
@@ -265,10 +303,30 @@ struct GameScene : public Scene
   void GameOver(){
   }
 
-
-
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
   {
+    SISprite *sA = (SISprite *)spriteA;
+    SISprite *sB = (SISprite *)spriteB;
+
+    if (sA->type == TYPE_PADDLE1 && sB->type == TYPE_BALL){
+      ballVelX = -ballVelX;
+      if (player1VelY_){
+        ballVelY += player1VelY_;
+      }
+      else{
+        ballVelY/=2;
+      }
+    }
+
+    if (sA->type == TYPE_PADDLE2 && sB->type == TYPE_BALL){
+      ballVelX = -ballVelX;
+      if (player2VelY_){
+        ballVelY += player2VelY_;
+      }
+      else{
+        ballVelY/=2;
+      }
+    }
   }
 };
 
