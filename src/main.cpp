@@ -254,8 +254,8 @@ struct GameScene : public Scene
   void drawScore()
   {
     canvas.setPenColor(255, 255, 255);
-    canvas.drawTextFmt(130, 10, "%02d" , scoreP1_);
-    canvas.drawTextFmt(172, 10, "%02d" ,scoreP2_);
+    canvas.drawTextFmt(130, 10, "%02d" , scoreP2_);
+    canvas.drawTextFmt(172, 10, "%02d" ,scoreP1_);
   }
 
   void scoreGoal(){
