@@ -62,6 +62,9 @@ struct IntroScene : public Scene
     canvas.setPenColor(255, 255, 255);
     canvas.drawRectangle(17, 4, 301, 5);
     canvas.drawRectangle(17, 188, 301, 189);
+
+    music_ = soundGenerator.playSamples(themeSoundSamples, sizeof(themeSoundSamples), 100, -1);
+
   }
 
   void update(int updateCount)
@@ -69,8 +72,10 @@ struct IntroScene : public Scene
     
     if (starting_)
     {
-      if (starting_ > 50)
+      if (starting_ > 50){
+        soundGenerator.detach(music_);
         stop();
+      }
       ++starting_;
       canvas.scroll(0, -5);
     }
@@ -204,6 +209,7 @@ struct GameScene : public Scene
 
   void moveBall(int rn){
     if((ball_->y < 7 || ball_->y > 184) && !collided_){
+      soundGenerator.playSamples(invadersSoundSamples[0], invadersSoundSamplesSize[0]);      
       ballVelY = -ballVelY;
       collided_ = true;
       impulsed_ = false;
@@ -260,11 +266,13 @@ struct GameScene : public Scene
 
   void scoreGoal(){
     if (ball_->x > 308 && !scored_){
+      soundGenerator.playSamples(shootSoundSamples, sizeof(shootSoundSamples));
       scoreP2_++;
       updateScore_ = true;
       scored_ = true;
     }
     else if (ball_->x < 10 && !scored_){
+      soundGenerator.playSamples(shootSoundSamples, sizeof(shootSoundSamples));
       scoreP1_++;
       updateScore_ = true;
       scored_ = true;
@@ -327,6 +335,7 @@ struct GameScene : public Scene
     SISprite *sB = (SISprite *)spriteB;
 
     if (sA->type == TYPE_PADDLE1 && sB->type == TYPE_BALL){
+      soundGenerator.playSamples(invadersSoundSamples[3], invadersSoundSamplesSize[3]);      
       ballVelX = -ballVelX;
       if (ballVelX >= -4)
         ballVelX--;
@@ -340,6 +349,7 @@ struct GameScene : public Scene
     }
 
     if (sA->type == TYPE_PADDLE2 && sB->type == TYPE_BALL){
+      soundGenerator.playSamples(invadersSoundSamples[3], invadersSoundSamplesSize[3]);      
       ballVelX = -ballVelX;
       if (ballVelX <= 4)
         ballVelX++;
@@ -359,7 +369,7 @@ int GameScene::scoreP2_ = 0;
 
 void setup()
 {
-  Ps3.begin("78:dd:08:4d:94:a4");
+  Ps3.begin("24:6f:28:af:1c:66");
   DisplayController.begin();
   DisplayController.setResolution(VGA_320x200_75Hz);
 }
