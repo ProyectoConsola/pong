@@ -8,6 +8,10 @@
 // Ambas barras se mueven con los dos sticks del mando
 // La pelota comienza a moverse una vez se haya pulsado D-Pad abajo, o X en el mando
 
+//Las variables van a ser globales para que no cause proplema
+constexpr unsigned long TIEMPO_LIMITE = 90000;
+unsigned long tiempoInicio;
+
 using fabgl::iclamp;
 
 fabgl::VGAController DisplayController;
@@ -99,7 +103,8 @@ struct IntroScene : public Scene
   {
   }
 };
-
+unsigned long TiempoInicio;
+unsigned long TiempoTranscurrido;
 // GameScene
 struct GameScene : public Scene
 {
@@ -172,6 +177,7 @@ struct GameScene : public Scene
 
   void init()
   {
+    TiempoInicio=millis();
     // setup player 1
     player1_->addBitmap(&bmpPaddle);
     player1_->moveTo(PADDLE1_START_X, PADDLE_START_Y);
@@ -206,7 +212,17 @@ struct GameScene : public Scene
     canvas.setGlyphOptions(GlyphOptions().FillBackground(true));
     canvas.selectFont(&fabgl::FONT_8x16);
   }
-
+  void gameOver(){
+    // disable enemies drawing, so text can be over them
+    canvas.clear();
+    stop();
+    // show game over
+    
+    // change state
+    gameState_ = GAMESTATE_GAMEOVER;
+    
+    
+  }
   void moveBall(int rn){
     if((ball_->y < 7 || ball_->y > 184) && !collided_){
       soundGenerator.playSamples(invadersSoundSamples[0], invadersSoundSamplesSize[0]);      
@@ -327,6 +343,13 @@ struct GameScene : public Scene
     updateSpriteAndDetectCollisions(player2_);
 
     DisplayController.refreshSprites();
+    TiempoTranscurrido=(millis()-TiempoInicio)/1000;
+    if(90-TiempoTranscurrido==0){
+      gameOver();
+      TiempoTranscurrido=0;
+    }
+    canvas.setPenColor(255, 255, 255);
+    canvas.drawTextFmt(150, 14, "%2d", 90 - TiempoTranscurrido);
   }
 
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
@@ -366,7 +389,35 @@ struct GameScene : public Scene
 
 int GameScene::scoreP1_ = 0;
 int GameScene::scoreP2_ = 0;
+struct FinalScene : public Scene{
 
+  FinalScene()
+      : Scene(0, 20, DisplayController.getViewPortWidth(), DisplayController.getViewPortHeight())
+  {
+  }
+  void init(){
+    canvas.clear();
+    canvas.setBrushColor(0, 0, 0);
+    canvas.setPenColor(248, 252, 167);//248, 252, 67
+    canvas.setBrushColor(28, 35, 92);
+    canvas.fillRectangle(40, 60, 270, 130);
+    canvas.drawRectangle(40, 60, 270, 130);
+    canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
+    canvas.setPenColor(255, 255, 255);
+    canvas.drawText(80, 72, "TIEMPO TERMINADO!");//55, 80
+    canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
+   // canvas.setPenColor(248, 252, 167);
+   // canvas.drawText(100, 110, "Presiona [START]");
+
+  }
+  void update(int updateCount)
+  {
+  }
+  void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
+  {
+  }
+
+};
 void setup()
 {
   Ps3.begin("24:6f:28:af:1c:66");
@@ -380,4 +431,6 @@ void loop()
   introScene.start();
   GameScene gameScene;
   gameScene.start();
+  FinalScene finalScene;
+  finalScene.start();
 }
