@@ -415,7 +415,7 @@ struct FinalScene : public Scene{
       canvas.drawTextFmt(117, 112,"%d puntos", scoreP2_);
     }
     else {
-      canvas.drawText(120, 92,"Empate!");
+      canvas.drawText(120, 117,"Empate!");
     }
     canvas.drawText(centerText("Presiona [VERDE] para jugar", 8), 132, "Presiona [VERDE] para jugar");
 
