@@ -12,6 +12,9 @@
 constexpr unsigned long TIEMPO_LIMITE = 90000;
 unsigned long tiempoInicio;
 
+int scoreP1_ = 0;
+int scoreP2_ = 0;
+
 using fabgl::iclamp;
 
 fabgl::VGAController DisplayController;
@@ -88,12 +91,12 @@ struct IntroScene : public Scene
       if (updateCount % 20 == 0)
       {
         canvas.setPenColor(255, random(255), random(255));
-        canvas.drawText(centerText("Presiona [START] para jugar", 8), 100, "Presiona [START] para jugar");
+        canvas.drawText(centerText("Presiona [VERDE] para jugar", 8), 100, "Presiona [VERDE] para jugar");
       }
 
       if (updateCount > 50)
       {
-        if (Ps3.event.button_down.start)
+        if (Ps3.event.button_down.start || Ps3.event.button_down.select)
           starting_ = true;
       }
     }
@@ -145,9 +148,6 @@ struct GameScene : public Scene
   int POINT_START_Y = 8;
   int POINT_END_Y = 9;
 
-  static int scoreP1_;
-  static int scoreP2_;
-
   SISprite *sprites_ = new SISprite[SPRITESCOUNT];
   SISprite *player1_ = sprites_;
   SISprite *player2_ = player1_ + PADDLECOUNT;
@@ -164,6 +164,9 @@ struct GameScene : public Scene
   bool reseted_ = true;
   bool impulsed_ = false;
   bool collided_ = false;
+
+  //int scoreP1_;
+  //int scoreP2_;
   
   GameScene()
       : Scene(3, 20, DisplayController.getViewPortWidth(), DisplayController.getViewPortHeight())
@@ -214,7 +217,9 @@ struct GameScene : public Scene
   }
   void gameOver(){
     // disable enemies drawing, so text can be over them
-    canvas.clear();
+    //canvas.clear();
+    //DisplayController.removeSprites();
+    ball_->visible = false;
     stop();
     // show game over
     
@@ -387,8 +392,6 @@ struct GameScene : public Scene
   }
 };
 
-int GameScene::scoreP1_ = 0;
-int GameScene::scoreP2_ = 0;
 struct FinalScene : public Scene{
 
   FinalScene()
@@ -396,22 +399,37 @@ struct FinalScene : public Scene{
   {
   }
   void init(){
-    canvas.clear();
     canvas.setBrushColor(0, 0, 0);
-    canvas.setPenColor(248, 252, 167);//248, 252, 67
-    canvas.setBrushColor(28, 35, 92);
-    canvas.fillRectangle(40, 60, 270, 130);
-    canvas.drawRectangle(40, 60, 270, 130);
+    canvas.setPenColor(255, 255, 255);
+    canvas.fillRectangle(40, 60, 270, 160);
+    canvas.drawRectangle(40, 60, 270, 160);
     canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
     canvas.setPenColor(255, 255, 255);
-    canvas.drawText(80, 72, "TIEMPO TERMINADO!");//55, 80
-    canvas.setGlyphOptions(GlyphOptions().DoubleWidth(0));
-   // canvas.setPenColor(248, 252, 167);
-   // canvas.drawText(100, 110, "Presiona [START]");
+    canvas.drawText(90, 72, "TIEMPO TERMINADO!");//55, 80
+    if (scoreP1_ > scoreP2_){
+      canvas.drawTextFmt(70, 92,"El jugador 1 gana con");
+      canvas.drawTextFmt(117, 112,"%d puntos", scoreP1_);
+    }
+    else if(scoreP2_ > scoreP1_){
+      canvas.drawTextFmt(70, 92,"El jugador 2 gana con");
+      canvas.drawTextFmt(117, 112,"%d puntos", scoreP2_);
+    }
+    else {
+      canvas.drawText(120, 92,"Empate!");
+    }
+    canvas.drawText(centerText("Presiona [VERDE] para jugar", 8), 132, "Presiona [VERDE] para jugar");
+
 
   }
   void update(int updateCount)
   {
+    if (Ps3.event.button_down.start || Ps3.event.button_down.select)
+    {
+      canvas.clear();
+      DisplayController.removeSprites();
+      stop();
+    }
+    
   }
   void collisionDetected(Sprite *spriteA, Sprite *spriteB, Point collisionPoint)
   {
@@ -427,6 +445,8 @@ void setup()
 
 void loop()
 {
+  scoreP1_ = 0;
+  scoreP2_ = 0;
   IntroScene introScene;
   introScene.start();
   GameScene gameScene;
